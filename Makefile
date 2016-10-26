@@ -33,6 +33,10 @@ endif
 # Use the version number as the release tag.
 TAG = $(VERSION)
 
+# Detect if we are in a CI pipeline, if so skip checking the working directory.
+ifndef CI
+ifndef CIRCLECI
+
 # Find out if the working directory is clean.
 GIT_NOT_CLEAN_CHECK = $(shell git status --porcelain)
 ifneq (x$(GIT_NOT_CLEAN_CHECK), x)
@@ -58,7 +62,9 @@ else
 # Add the commit ref for development builds. Mark as dirty if the working
 # directory isn't clean.
 TAG = $(VERSION)$(TAG_SUFFIX)
-endif
+endif # ifeq ($(MAKECMDGOALS), push)
+endif # ifndef CIRCLECI
+endif # ifndef CI
 
 # Load the latest tag, and set a default for TAG. The goal here is to ensure
 # TAG is set as early possible, considering it's usually provided as an input
