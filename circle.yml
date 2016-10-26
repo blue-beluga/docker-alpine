@@ -5,6 +5,11 @@ machine:
     - docker
 
 dependencies:
+  pre:
+    # update locally with:
+    # openssl aes-256-cbc -e -in .secret-env-plain -out .secret-env-enc -k $KEY
+    - openssl aes-256-cbc -d -in .secret-env-enc -k $KEY >> ~/.circlerc
+
   override:
     - make deps
     - make build
@@ -17,9 +22,6 @@ deployment:
   master:
     branch: master
     commands:
-      # update locally with:
-      # openssl aes-256-cbc -e -in .secret-env-plain -out .circlerc.enc -k $KEY
-      - openssl aes-256-cbc -d -in .circlerc.enc -k $KEY >> ~/.circlerc
       - eval $(docker run bluebeluga/mkdocs circleci-cmd)
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - make push
