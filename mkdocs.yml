@@ -1,0 +1,18 @@
+# encoding: UTF-8
+
+site_name: Docker Alpine
+site_author: The Blue Beluga Company
+site_description: A base Alpine Linux container
+site_url: http://blue-beluga.github.io/docker-alpine/latest/
+repo_url: https://github.com/blue-beluga/docker-alpine.git
+repo_name: GitHub
+copyright: Copyright &copy; 2016, The Blue Beluga Company, Inc.
+site_favicon: favicon.ico
+theme_dir: /mkdocs/theme
+dev_addr: 0.0.0.0:8000
+markdown_extensions:
+  - codehilite
+extra_css:
+- css/highlight-custom.cssdocker
+pages:
+  - Home: index.md

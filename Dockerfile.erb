@@ -1,0 +1,30 @@
+# encoding: UTF-8
+
+FROM       <%= ENV.fetch('FROM') %>
+MAINTAINER The Blue Beluga Company <admin@bluebeluga.io>
+
+ARG VCS_REF
+ARG VCS_URL
+ARG VERSION
+ARG BUILD_DATE
+
+LABEL org.label-schema.vendor="The Blue Beluga Company" \
+      org.label-schema.url=http://blue-beluga.github.io/docker-alpine/latest/ \
+      org.label-schema.name=docker-alpine \
+      org.label-schema.license=MIT \
+      org.label-schema.version=$VERSION \
+      org.label-schema.vcs-url=$VCS_URL \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.schema-version=1.0 \
+      io.bluebeluga.alpine.dockerfile=/Dockerfile
+
+COPY files/apk-install /usr/bin/apk-install
+
+RUN set -x \
+ && apk upgrade --update \
+ && rm -rf /var/cache/apk/*
+
+ONBUILD RUN set -x \
+         && apk upgrade --update \
+         && rm -rf /var/cache/apk/*
