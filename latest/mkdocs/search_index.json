@@ -1,0 +1,74 @@
+{
+    "docs": [
+        {
+            "location": "/", 
+            "text": "bluebeluga/alpine\n\n\n\n\n\n\n\n\nA minimalist \nAlpine Linux\n container.\n\n\nREPOSITORY          TAG           IMAGE ID          VIRTUAL SIZE\nbluebeluga/alpine   latest        c2d2631a367f      5.469 MB\nalpine              latest        baa5d63471ea      4.803 MB\ndebian              latest        4d6ce913b130      84.98 MB\nubuntu              latest        b39b81afc8ca      188.3 MB\ncentos              latest        8efe422e6104      210 MB\n\n\n\n\n\nInstallation and Usage\n\n\nA contains should only contain the OS libraries and language dependencies required to run an application and the application itself.\n\n\nExample\n\n\nRather than starting with everything but the kitchen sink, start with the \nbare minimum and add dependencies\n on an as needed basis.\n\n\nFROM bluebeluga/alpine:3.4\nRUN apk add --update dnsmasq \\\n \n rm -rf /var/cache/apk/*\nEXPOSE 53 53/udp\nENTRYPOINT [\ndnsmasq\n, \n-k\n]\n\n\n\n\n\nWe now have a very small container with only the dependencies we need. Nothing more.\n\n\nDisabling Cache\n\n\nAs of Alpine Linux 3.3 there exists a new \n--no-cache\n option for \napk\n. It allows users to install packages with an index that is updated and used on-the-fly and not cached locally:\n\n\nFROM bluebeluga/alpine:3.4\nRUN apk --no-cache add dnsmasq\nEXPOSE 53 53/udp\nENTRYPOINT [\ndnsmasq\n, \n-k\n]\n\n\n\n\n\nThis avoids the need to use \n--update\n and remove \n/var/cache/apk/*\n when done installing packages.\n\n\nCleanup\n\n\nThis image contains a wrapper script that assists in the cleanup of the package index after installing packages. Here is another simple \nDockerfile\n that installs the \nnginx\n package and removes package index data:\n\n\nFROM bluebeluga/alpine:3.4\nRUN apk-install nginx\nEXPOSE 80\nCMD [\nnginx\n, \n-g\n, \ndaemon off;\n]\n\n\n\n\n\nVirtual Packages\n\n\nAnother great apk add feature for cleanup is the concept of virtual packages using the \n--virtual\n or \n-t\n switch. Packages added under this virtual name can then be removed as one group. An example use of this would be removing a group of build dependencies all at once:\n\n\nFROM bluebeluga/alpine:3.4\nRUN apk --update add python py-pip openssl ca-certificates\nRUN apk --update add --virtual build-dependencies python-dev build-base wget \\\n  \n pip install -r requirements.txt \\\n  \n python setup.py install \\\n  \n apk del build-dependencies\nCMD [\nmyapp\n, \nstart\n]\n\n\n\n\n\nAvailable Tags\n\n\n\n\nlatest\n: \nCurrently 3.4\n\n\n3.2\n:\n\n\n3.3\n:\n\n\n3.4\n\n\nedge\n:\n\n\n\n\nBuild\n\n\nBuild the container:\n\n\nmake build\n\n\n\n\n\nTest\n\n\nRun automated tests on one or more instances:\n\n\nmake test\n\n\n\n\n\nPush\n\n\nPush image or a repository to the registry:\n\n\nmake push\n\n\n\n\n\nClean\n\n\nStop and remove build artifacts and images:\n\n\nmake clean\n\n\n\n\n\nContributing\n\n\nPlease see the \nCONTRIBUTING.md\n.\n\n\nLicense and Authors\n\n\nMIT License\n\nCopyright (c) 2016 The Blue Beluga Company\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \nSoftware\n), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \nAS IS\n, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.", 
+            "title": "Home"
+        }, 
+        {
+            "location": "/#bluebelugaalpine", 
+            "text": "A minimalist  Alpine Linux  container.  REPOSITORY          TAG           IMAGE ID          VIRTUAL SIZE\nbluebeluga/alpine   latest        c2d2631a367f      5.469 MB\nalpine              latest        baa5d63471ea      4.803 MB\ndebian              latest        4d6ce913b130      84.98 MB\nubuntu              latest        b39b81afc8ca      188.3 MB\ncentos              latest        8efe422e6104      210 MB", 
+            "title": "bluebeluga/alpine"
+        }, 
+        {
+            "location": "/#installation-and-usage", 
+            "text": "A contains should only contain the OS libraries and language dependencies required to run an application and the application itself.", 
+            "title": "Installation and Usage"
+        }, 
+        {
+            "location": "/#example", 
+            "text": "Rather than starting with everything but the kitchen sink, start with the  bare minimum and add dependencies  on an as needed basis.  FROM bluebeluga/alpine:3.4\nRUN apk add --update dnsmasq \\\n   rm -rf /var/cache/apk/*\nEXPOSE 53 53/udp\nENTRYPOINT [ dnsmasq ,  -k ]  We now have a very small container with only the dependencies we need. Nothing more.", 
+            "title": "Example"
+        }, 
+        {
+            "location": "/#disabling-cache", 
+            "text": "As of Alpine Linux 3.3 there exists a new  --no-cache  option for  apk . It allows users to install packages with an index that is updated and used on-the-fly and not cached locally:  FROM bluebeluga/alpine:3.4\nRUN apk --no-cache add dnsmasq\nEXPOSE 53 53/udp\nENTRYPOINT [ dnsmasq ,  -k ]  This avoids the need to use  --update  and remove  /var/cache/apk/*  when done installing packages.", 
+            "title": "Disabling Cache"
+        }, 
+        {
+            "location": "/#cleanup", 
+            "text": "This image contains a wrapper script that assists in the cleanup of the package index after installing packages. Here is another simple  Dockerfile  that installs the  nginx  package and removes package index data:  FROM bluebeluga/alpine:3.4\nRUN apk-install nginx\nEXPOSE 80\nCMD [ nginx ,  -g ,  daemon off; ]", 
+            "title": "Cleanup"
+        }, 
+        {
+            "location": "/#virtual-packages", 
+            "text": "Another great apk add feature for cleanup is the concept of virtual packages using the  --virtual  or  -t  switch. Packages added under this virtual name can then be removed as one group. An example use of this would be removing a group of build dependencies all at once:  FROM bluebeluga/alpine:3.4\nRUN apk --update add python py-pip openssl ca-certificates\nRUN apk --update add --virtual build-dependencies python-dev build-base wget \\\n    pip install -r requirements.txt \\\n    python setup.py install \\\n    apk del build-dependencies\nCMD [ myapp ,  start ]", 
+            "title": "Virtual Packages"
+        }, 
+        {
+            "location": "/#available-tags", 
+            "text": "latest :  Currently 3.4  3.2 :  3.3 :  3.4  edge :", 
+            "title": "Available Tags"
+        }, 
+        {
+            "location": "/#build", 
+            "text": "Build the container:  make build", 
+            "title": "Build"
+        }, 
+        {
+            "location": "/#test", 
+            "text": "Run automated tests on one or more instances:  make test", 
+            "title": "Test"
+        }, 
+        {
+            "location": "/#push", 
+            "text": "Push image or a repository to the registry:  make push", 
+            "title": "Push"
+        }, 
+        {
+            "location": "/#clean", 
+            "text": "Stop and remove build artifacts and images:  make clean", 
+            "title": "Clean"
+        }, 
+        {
+            "location": "/#contributing", 
+            "text": "Please see the  CONTRIBUTING.md .", 
+            "title": "Contributing"
+        }, 
+        {
+            "location": "/#license-and-authors", 
+            "text": "MIT License\n\nCopyright (c) 2016 The Blue Beluga Company\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the  Software ), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED  AS IS , WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.", 
+            "title": "License and Authors"
+        }
+    ]
+}

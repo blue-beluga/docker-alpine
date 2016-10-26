@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A base Alpine Linux container"> 
+    <meta name="author" content="The Blue Beluga Company"> 
+    <link rel="canonical" href="http://blue-beluga.github.io/docker-alpine/latest/"> 
+    <link rel="shortcut icon" href="./favicon.ico">
+
+    <title>Docker Alpine</title>
+
+    <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="./css/base.css" rel="stylesheet">
+    <link href="./css/cinder.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/highlight.css">
+
+
+    <link href="./css/highlight-custom.cssdocker" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
+
+    
+</head>
+
+<body class="homepage" >
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+            <a class="navbar-brand" href=".">Docker Alpine</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                
+                
+                    <li>
+                        <a href="https://github.com/blue-beluga/docker-alpine.git">
+                            
+                                <i class="fa fa-github"></i>
+                            
+                            GitHub
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="first-level active"><a href="#bluebelugaalpine">bluebeluga/alpine</a></li>
+        
+            <li class="second-level"><a href="#installation-and-usage">Installation and Usage</a></li>
+            
+        
+            <li class="second-level"><a href="#example">Example</a></li>
+            
+        
+            <li class="second-level"><a href="#disabling-cache">Disabling Cache</a></li>
+            
+        
+            <li class="second-level"><a href="#cleanup">Cleanup</a></li>
+            
+        
+            <li class="second-level"><a href="#virtual-packages">Virtual Packages</a></li>
+            
+        
+            <li class="second-level"><a href="#available-tags">Available Tags</a></li>
+            
+        
+            <li class="second-level"><a href="#build">Build</a></li>
+            
+        
+            <li class="second-level"><a href="#test">Test</a></li>
+            
+        
+            <li class="second-level"><a href="#push">Push</a></li>
+            
+        
+            <li class="second-level"><a href="#clean">Clean</a></li>
+            
+        
+            <li class="second-level"><a href="#contributing">Contributing</a></li>
+            
+        
+            <li class="second-level"><a href="#license-and-authors">License and Authors</a></li>
+            
+        
+    
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<p><img alt="bluebeluga/alpine" src="https://raw.githubusercontent.com/blue-beluga/docker-alpine/master/docs/images/bluebeluga.png" /></p>
+<h1 id="bluebelugaalpine">bluebeluga/alpine</h1>
+<p><a href="https://circleci.com/gh/riddopic/docker-alpine"><img alt="CircleCI" src="https://circleci.com/gh/riddopic/docker-alpine.svg?style=svg" /></a>
+<a href="https://microbadger.com/images/bluebeluga/alpine" title="Get your own image badge on microbadger.com"><img alt="" src="https://images.microbadger.com/badges/image/bluebeluga/alpine.svg" /></a>
+<a href="https://microbadger.com/images/bluebeluga/alpine" title="Get your own version badge on microbadger.com"><img alt="" src="https://images.microbadger.com/badges/version/bluebeluga/alpine.svg" /></a></p>
+<p>A minimalist <a href="http://alpinelinux.org/">Alpine Linux</a> container.</p>
+<div class="codehilite"><pre><span></span>REPOSITORY          TAG           IMAGE ID          VIRTUAL SIZE
+bluebeluga/alpine   latest        c2d2631a367f      5.469 MB
+alpine              latest        baa5d63471ea      4.803 MB
+debian              latest        4d6ce913b130      84.98 MB
+ubuntu              latest        b39b81afc8ca      188.3 MB
+centos              latest        8efe422e6104      210 MB
+</pre></div>
+
+
+<h2 id="installation-and-usage">Installation and Usage</h2>
+<p>A contains should only contain the OS libraries and language dependencies required to run an application and the application itself.</p>
+<h2 id="example">Example</h2>
+<p>Rather than starting with everything but the kitchen sink, start with the <strong>bare minimum and add dependencies</strong> on an as needed basis.</p>
+<div class="codehilite"><pre><span></span>FROM bluebeluga/alpine:3.4
+RUN apk add --update dnsmasq \
+ &amp;&amp; rm -rf /var/cache/apk/*
+EXPOSE 53 53/udp
+ENTRYPOINT [&quot;dnsmasq&quot;, &quot;-k&quot;]
+</pre></div>
+
+
+<p>We now have a very small container with only the dependencies we need. Nothing more.</p>
+<h2 id="disabling-cache">Disabling Cache</h2>
+<p>As of Alpine Linux 3.3 there exists a new <code>--no-cache</code> option for <code>apk</code>. It allows users to install packages with an index that is updated and used on-the-fly and not cached locally:</p>
+<div class="codehilite"><pre><span></span>FROM bluebeluga/alpine:3.4
+RUN apk --no-cache add dnsmasq
+EXPOSE 53 53/udp
+ENTRYPOINT [&quot;dnsmasq&quot;, &quot;-k&quot;]
+</pre></div>
+
+
+<p>This avoids the need to use <code>--update</code> and remove <code>/var/cache/apk/*</code> when done installing packages.</p>
+<h2 id="cleanup">Cleanup</h2>
+<p>This image contains a wrapper script that assists in the cleanup of the package index after installing packages. Here is another simple <code>Dockerfile</code> that installs the <code>nginx</code> package and removes package index data:</p>
+<div class="codehilite"><pre><span></span>FROM bluebeluga/alpine:3.4
+RUN apk-install nginx
+EXPOSE 80
+CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
+</pre></div>
+
+
+<h2 id="virtual-packages">Virtual Packages</h2>
+<p>Another great apk add feature for cleanup is the concept of virtual packages using the <code>--virtual</code> or <code>-t</code> switch. Packages added under this virtual name can then be removed as one group. An example use of this would be removing a group of build dependencies all at once:</p>
+<div class="codehilite"><pre><span></span>FROM bluebeluga/alpine:3.4
+RUN apk --update add python py-pip openssl ca-certificates
+RUN apk --update add --virtual build-dependencies python-dev build-base wget \
+  &amp;&amp; pip install -r requirements.txt \
+  &amp;&amp; python setup.py install \
+  &amp;&amp; apk del build-dependencies
+CMD [&quot;myapp&quot;, &quot;start&quot;]
+</pre></div>
+
+
+<h2 id="available-tags">Available Tags</h2>
+<ul>
+<li><code>latest</code>: <strong>Currently 3.4</strong></li>
+<li><code>3.2</code>:</li>
+<li><code>3.3</code>:</li>
+<li><code>3.4</code></li>
+<li><code>edge</code>:</li>
+</ul>
+<h2 id="build">Build</h2>
+<p>Build the container:</p>
+<div class="codehilite"><pre><span></span>make build
+</pre></div>
+
+
+<h2 id="test">Test</h2>
+<p>Run automated tests on one or more instances:</p>
+<div class="codehilite"><pre><span></span>make test
+</pre></div>
+
+
+<h2 id="push">Push</h2>
+<p>Push image or a repository to the registry:</p>
+<div class="codehilite"><pre><span></span>make push
+</pre></div>
+
+
+<h2 id="clean">Clean</h2>
+<p>Stop and remove build artifacts and images:</p>
+<div class="codehilite"><pre><span></span>make clean
+</pre></div>
+
+
+<h2 id="contributing">Contributing</h2>
+<p>Please see the <a href="CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+<h2 id="license-and-authors">License and Authors</h2>
+<div class="codehilite"><pre><span></span>MIT License
+
+Copyright (c) 2016 The Blue Beluga Company
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</pre></div></div>
+        
+    </div>
+
+    <footer class="col-md-12 text-center">
+        <hr>
+        <p>
+        <small>Copyright &copy; 2016, The Blue Beluga Company, Inc.<br></small>
+        
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+    </footer>
+
+    <script src="./js/jquery-1.10.2.min.js"></script>
+    <script src="./js/bootstrap-3.0.3.min.js"></script>
+    <script src="./js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+    var base_url = '.';
+    </script>
+    <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
+    <script src="./js/base.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        From here you can search these documents. Enter your search terms below.
+                    </p>
+                    <form role="form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                        </div>
+                    </form>
+                    <div id="mkdocs-search-results"></div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </body>
+
+</html>
+
+<!--
+MkDocs version : 0.15.3
+Build Date UTC : 2016-10-26 15:02:45.032977
+-->
