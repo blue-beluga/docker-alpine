@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-FROM       <%= ENV.fetch('FROM') %>
+FROM       {{ $from }}
 MAINTAINER The Blue Beluga Company <admin@bluebeluga.io>
 
 ARG VCS_REF

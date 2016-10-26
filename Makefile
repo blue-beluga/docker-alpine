@@ -120,11 +120,6 @@ PUSH_REGISTRIES ?= $(REGISTRY)
 export TAG
 export REGISTRY
 export REPOSITORY
-ifdef FROM_REGISTRY
-export FROM = $(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)
-else
-export FROM = $(FROM_REPOSITORY):$(FROM_TAG)
-endif
 
 # ******************************************************************************
 # The rule that occurs first in the makefile is the default.
@@ -138,7 +133,7 @@ all : test
 # exist, so we say that `all` is a `PHONY` target, i.e., a target that `make`
 # should always try to update. We do that by making all a dependency of the
 # special target `.PHONY`:
-.PHONY : all build .build_id .banner push test
+.PHONY : all prerequisite build .build_id .banner push test
 
 # Print out a header.
 .banner:
@@ -147,6 +142,14 @@ all : test
 	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Build Tags" "$(PUSH_TAGS)"
 	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Registries" $(REGISTRY)
 	@printf "$(YELLOW)---------------------------------------------------------\n"
+
+prerequisite:
+ifneq (,$(wildcard sigil))
+	curl -sSLO https://dl.gliderlabs.com/sigil/latest/$(uname -sm|tr \  _).tgz
+	echo "c503bc15fba88d08fe7ba350fc02e61c4757d13f349f56cf5b7977f8139d5843  $(uname -sm|tr \  _).tgz" | sha256sum -c -
+	tar -zx $(uname -sm|tr \  _).tgz -C /usr/local/bin
+	rm $(uname -sm|tr \  _).tgz
+endif
 
 # `build` depends on `.build_id`, that rule is a bit particular as it actually
 # represent a file on disc. It is used as placeholder to know if we need to
@@ -198,27 +201,29 @@ clean: .banner
 	@docker images -qa "$(REPOSITORY):$(TAG)" | xargs docker rmi -f
 	@docker images -qa "$(REPOSITORY):latest" | xargs docker rmi -f
 
-# Per-tag Dockerfile target. Look for Dockerfile or Dockerfile.erb in the root,
-# and use it for $(TAG). We prioritize Dockerfile.erb over Dockerfile if
+# Per-tag Dockerfile target. Look for Dockerfile or Dockerfile.tmpl in the root,
+# and use it for $(TAG). We prioritize Dockerfile.tmpl over Dockerfile if
 # both are present.
-.render: $(TAG) Dockerfile.erb Dockerfile
-ifneq (,$(wildcard Dockerfile.erb))
-	@erb "Dockerfile.erb" > "versions/$(VERSION)/Dockerfile"
+.render: $(TAG) prerequisite Dockerfile.tmpl Dockerfile
+ifneq (,$(wildcard Dockerfile.tmpl))
+	@sigil -f Dockerfile.tmpl \
+						from=$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG) \
+					> versions/$(VERSION)/Dockerfile
 else
-	@cp "Dockerfile" > "versions/$(VERSION)/Dockerfile"
+	@cp "Dockerfile" > versions/$(VERSION)/Dockerfile
 endif
 
-# Pseudo targets for Dockerfile and Dockerfile.erb. They don't technically
+# Pseudo targets for Dockerfile and Dockerfile.tmpl. They don't technically
 # create anything, but each warn if the other file is missing (meaning both
 # files are missing).
-Dockerfile.erb:
-ifneq (,$(wildcard Dockerfile.erb))
-	$(warning You must create a Dockerfile.erb or Dockerfile)
+Dockerfile.tmpl:
+ifneq (,$(wildcard Dockerfile.tmpl))
+	$(warning You must create a Dockerfile.tmpl or Dockerfile)
 endif
 
 Dockerfile:
 ifneq (,$(wildcard Dockerfile))
-	$(warning You must create a Dockerfile.erb or Dockerfile)
+	$(warning You must create a Dockerfile.tmpl or Dockerfile)
 endif
 
 $(TAG):
