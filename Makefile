@@ -153,10 +153,10 @@ all : test
 	@printf "$(YELLOW)---------------------------------------------------------\n"
 
 prerequisite:
-	@set -e; curl -sSLO $(SIGIL_URL)/$(SIGIL_TGZ)
+	@set -e; mkdir -p $HOME/bin; curl -sSLO $(SIGIL_URL)/$(SIGIL_TGZ)
 	@echo $(SIGIL_SHA)  $(SIGIL_TGZ)
 	@echo $(SIGIL_SHA)  $(SIGIL_TGZ) | sha256sum -c -
-	@tar zxf $(SIGIL_TGZ) -C /usr/local/bin
+	@tar zxf $(SIGIL_TGZ) -C $(HOME)/bin/
 	@rm -f $(SIGIL_TGZ)
 
 # `build` depends on `.build_id`, that rule is a bit particular as it actually
