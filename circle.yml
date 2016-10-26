@@ -5,12 +5,15 @@ machine:
     version: 2.2.3
   services:
     - docker
+
 dependencies:
   override:
     - make build
+
 test:
   override:
     - make test
+
 deployment:
   master:
     branch: master
@@ -21,6 +24,7 @@ deployment:
       - eval $(docker run bluebeluga/mkdocs circleci-cmd)
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - make push
+
 general:
   branches:
     ignore:

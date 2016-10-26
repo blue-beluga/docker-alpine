@@ -22,7 +22,7 @@ NO_COLOR = \033[0m
 endif
 
 # Get the latest commit.
-COMMIT = $(strip $(shell git rev-parse --short HEAD))
+GIT_COMMIT = $(strip $(shell git rev-parse --short HEAD))
 
 # Get the version number from the code.
 VERSION = $(strip $(shell cat VERSION))
@@ -36,7 +36,7 @@ TAG = $(VERSION)
 # Find out if the working directory is clean.
 GIT_NOT_CLEAN_CHECK = $(shell git status --porcelain)
 ifneq (x$(GIT_NOT_CLEAN_CHECK), x)
-TAG_SUFFIX = -$(COMMIT)-dirty
+TAG_SUFFIX = -$(GIT_COMMIT)-dirty
 endif
 
 # If we're pusing to the registry, and we're going to mark it with the latest
@@ -46,7 +46,7 @@ ifeq ($(MAKECMDGOALS), push)
 # See what commit is tagged to match the version.
 VERSION_COMMIT = $(strip $(shell git rev-list $(TAG) -n 1 | cut -c1-7))
 ifneq ($(VERSION_COMMIT), $(GIT_COMMIT))
-$(error echo You are trying to push a build based on commit '$(COMMIT)' but the tagged release version is '$(VERSION_COMMIT)')
+$(error echo You are trying to push a build based on commit '$(GIT_COMMIT)' but the tagged release version is '$(VERSION_COMMIT)')
 endif
 
 # Don't push to Docker Hub if this isn't a clean repo.
@@ -164,7 +164,7 @@ build: .banner .render .build_id
 	@docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 								--build-arg VERSION=$(TAG) \
 								--build-arg VCS_URL=`git config --get remote.origin.url` \
-								--build-arg VCS_REF=$(COMMIT) \
+								--build-arg VCS_REF=$(GIT_COMMIT) \
 								--tag	$(REGISTRY)/$(REPOSITORY):$(TAG) \
 								--file versions/$(VERSION)/Dockerfile .
 	@docker inspect --format '{{.Id}}' $(REGISTRY)/$(REPOSITORY):$(TAG) \
