@@ -6,7 +6,7 @@ machine:
 
 dependencies:
   override:
-    - make prerequisite
+    - make deps
     - make build
 
 test:
