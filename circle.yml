@@ -1,0 +1,24 @@
+# encoding: UTF-8
+---
+machine:
+  ruby:
+    version: 2.2.3
+  services:
+    - docker
+dependencies:
+  override:
+    - make build
+test:
+  override:
+    - /bin/true
+deployment:
+  master:
+    branch: master
+    commands:
+      - eval $(docker run bluebeluga/mkdocs circleci-cmd)
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - make push
+general:
+  branches:
+    ignore:
+      - gh-pages
