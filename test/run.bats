@@ -24,7 +24,7 @@ setup() {
   [ $status -eq 0 ]
 }
 
-@test "timezone" {
+@test "timezone set to UTC" {
   run docker run $REGISTRY/$REPOSITORY:$TAG date +%Z
   [ $status -eq 0 ]
   [ "$output" = "UTC" ]
@@ -63,7 +63,7 @@ setup() {
   [ $status -eq 1 ]
 }
 
-@test "CVE-2016-2183, CVE-2016-6304, CVE-2016-6306, CVE-2016-7052" {
+@test "protects from CVE-2016-2183, CVE-2016-6304, CVE-2016-6306, CVE-2016-7052" {
   if [ "$TAG" -eq "3.1" ]; then
     run docker run $REGISTRY/$REPOSITORY:$TAG \
       sh -c 'apk version -t $(apk info -v | grep ^libssl | cut -d- -f2-) 1.0.1u-r0 | grep -q "[=>]"'

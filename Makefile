@@ -117,9 +117,18 @@ PUSH_REGISTRIES ?= $(REGISTRY)
 
 # Export what we're building for e.g. test scripts to use. Exporting other
 # variables is the responsibility of config.mk and $(TAG)/config.mk.
-export TAG
-export REGISTRY
 export REPOSITORY
+export REGISTRY
+export TAG
+
+ifeq "$(PLATFORM)" "darwin"
+SIGIL_TGZ := sigil_0.4.0_Darwin_x86_64.tgz
+SIGIL_SHA := 2b8b2768515a3a4d8ff7f615a03210fe523fc12733cc64548e757625b6f9bd4a
+else
+SIGIL_TGZ := sigil_0.4.0_Linux_x86_64.tgz
+SIGIL_SHA := c503bc15fba88d08fe7ba350fc02e61c4757d13f349f56cf5b7977f8139d5843
+endif
+SIGIL_URL := https://github.com/gliderlabs/sigil/releases/download/v0.4.0/
 
 # ******************************************************************************
 # The rule that occurs first in the makefile is the default.
@@ -144,12 +153,11 @@ all : test
 	@printf "$(YELLOW)---------------------------------------------------------\n"
 
 prerequisite:
-ifneq (,$(wildcard sigil))
-	curl -sSLO https://dl.gliderlabs.com/sigil/latest/$(uname -sm|tr \  _).tgz
-	echo "c503bc15fba88d08fe7ba350fc02e61c4757d13f349f56cf5b7977f8139d5843  $(uname -sm|tr \  _).tgz" | sha256sum -c -
-	tar -zx $(uname -sm|tr \  _).tgz -C /usr/local/bin
-	rm $(uname -sm|tr \  _).tgz
-endif
+	@set -e; curl -sSLO $(SIGIL_URL)/$(SIGIL_TGZ)
+	@echo $(SIGIL_SHA)  $(SIGIL_TGZ)
+	@echo $(SIGIL_SHA)  $(SIGIL_TGZ) | sha256sum -c -
+	@tar zxf $(SIGIL_TGZ) -C /usr/local/bin
+	@rm -f $(SIGIL_TGZ)
 
 # `build` depends on `.build_id`, that rule is a bit particular as it actually
 # represent a file on disc. It is used as placeholder to know if we need to
@@ -167,9 +175,9 @@ build: .banner .render .build_id
 # make is called, nothing will happen unless something changed within the
 # directory.
 .build_id: .
-	@printf "$(CYAN)Pulling Image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
+	@printf "\n$(CYAN)Pulling Image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
 	@docker pull $(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)
-	@printf "$(CYAN)Building Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
+	@printf "\n$(CYAN)Building Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
 	@docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 								--build-arg VERSION=$(TAG) \
 								--build-arg VCS_URL=`git config --get remote.origin.url` \
@@ -192,11 +200,11 @@ push: .banner build test
 	done
 
 test: .banner build
-	@printf "$(CYAN)Testing Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
+	@printf "\n$(CYAN)Testing Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
 	@set -e; if [ -f 'test/run.bats' ]; then bats -p test/run.bats; break; fi
 
 clean: .banner
-	@printf "$(CYAN)Cleaning Image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
+	@printf "\n$(CYAN)Cleaning Image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
 	@rm -f .render .build Dockerfile
 	@docker images -qa "$(REPOSITORY):$(TAG)" | xargs docker rmi -f
 	@docker images -qa "$(REPOSITORY):latest" | xargs docker rmi -f
