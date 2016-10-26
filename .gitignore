@@ -69,3 +69,4 @@ bin/*
 .docker/config.json
 versions/*/Dockerfile
 versions/*/.build_id
+.secret-env-plain
