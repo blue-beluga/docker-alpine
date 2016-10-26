@@ -187,7 +187,7 @@ build: .banner .render .build_id
 	@docker inspect --format '{{.Id}}' $(REGISTRY)/$(REPOSITORY):$(TAG) \
 									> versions/$(VERSION)/.build_id
 ifeq "$(TAG)" "$(LATEST_TAG)"
-	@docker tag $(REGISTRY)/$(REPOSITORY):$(TAG) $(REGISTRY)/$(REPOSITORY):latest
+	@docker tag $(TAG_OPTS) $(REGISTRY)/$(REPOSITORY):$(TAG) $(REGISTRY)/$(REPOSITORY):latest
 endif
 
 push: .banner build test
