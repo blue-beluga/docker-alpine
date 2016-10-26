@@ -21,10 +21,5 @@ LABEL org.label-schema.vendor="The Blue Beluga Company" \
 
 COPY files/apk-install /usr/bin/apk-install
 
-RUN set -x \
- && apk upgrade --update \
- && rm -rf /var/cache/apk/*
-
-ONBUILD RUN set -x \
-         && apk upgrade --update \
-         && rm -rf /var/cache/apk/*
+RUN apk --no-cache add dnsmasq
+ONBUILD RUN apk --no-cache upgrade

@@ -137,13 +137,13 @@ SIGIL_URL := https://github.com/gliderlabs/sigil/releases/download/v0.4.0/
 #
 # Calling `make` will invoque the `all` rule.
 # `all` depends on `build` by convention.
-all : test
+all : deps build test push
 
 # We don't want `make` to get confused if a file named `all` should happen to
 # exist, so we say that `all` is a `PHONY` target, i.e., a target that `make`
 # should always try to update. We do that by making all a dependency of the
 # special target `.PHONY`:
-.PHONY : all prerequisite build .build_id .banner push test
+.PHONY : all build .build_id .banner push test
 
 # Print out a header.
 .banner:
@@ -153,8 +153,8 @@ all : test
 	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Registries" $(REGISTRY)
 	@printf "$(YELLOW)---------------------------------------------------------\n"
 
-prerequisite:
-	@set -e; mkdir -p $HOME/bin; curl -sSLO $(SIGIL_URL)/$(SIGIL_TGZ)
+deps:
+	@set -e; mkdir -p $(HOME)/bin; curl -sSLO $(SIGIL_URL)/$(SIGIL_TGZ)
 	@echo $(SIGIL_SHA)  $(SIGIL_TGZ) | sha256sum -c -
 	@tar zxf $(SIGIL_TGZ) -C $(HOME)/bin/
 	@rm -f $(SIGIL_TGZ)
@@ -190,16 +190,15 @@ ifeq "$(TAG)" "$(LATEST_TAG)"
 	@docker tag $(TAG_OPTS) $(REGISTRY)/$(REPOSITORY):$(TAG) $(REGISTRY)/$(REPOSITORY):latest
 endif
 
-push: .banner build test
-	for registry in $(PUSH_REGISTRIES); do \
-		for tag in $(PUSH_TAGS); do \
-			docker tag $(TAG_OPTS) $(REGISTRY)/$(REPOSITORY):$(TAG) \
-                  $${registry}/$(REPOSITORY):$${tag}; \
+push: .banner
+	@set -e; for registry in $(PUSH_REGISTRIES); do \
+		for tag in $(PUSH_TAGS); do printf "\n$(CYAN)Pushing Image $(YELLOW): $(YELLOW)$${registry}/$(REPOSITORY):$${tag}$(NO_COLOR)\n"
+			docker tag $(TAG_OPTS) $(REGISTRY)/$(REPOSITORY):$(TAG) $${registry}/$(REPOSITORY):$${tag}; \
 			docker push $${registry}/$(REPOSITORY):$${tag}; \
 		done \
 	done
 
-test: .banner build
+test: .banner
 	@printf "\n$(CYAN)Testing Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
 	@set -e; if [ -f 'test/run.bats' ]; then bats -p test/run.bats; break; fi
 
@@ -212,7 +211,7 @@ clean: .banner
 # Per-tag Dockerfile target. Look for Dockerfile or Dockerfile.tmpl in the root,
 # and use it for $(TAG). We prioritize Dockerfile.tmpl over Dockerfile if
 # both are present.
-.render: $(TAG) prerequisite Dockerfile.tmpl Dockerfile
+.render: $(TAG) deps Dockerfile.tmpl Dockerfile
 ifneq (,$(wildcard Dockerfile.tmpl))
 	@sigil -f Dockerfile.tmpl \
 						from=$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG) \
