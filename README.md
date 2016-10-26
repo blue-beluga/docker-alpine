@@ -1,5 +1,8 @@
 
-# [<img src="./docs/images/bluebeluga.png" height="100" width="200" style="border-radius: 50%;" alt="@fancyremarker" />](https://github.com/blue-beluga/docker-alpine) bluebeluga/docker-alpine
+![bluebeluga/alpine](https://raw.githubusercontent.com/blue-beluga/docker-alpine/master/docs/images/bluebeluga.png)
+
+# bluebeluga/alpine
+
 
 [![CircleCI](https://circleci.com/gh/riddopic/docker-alpine.svg?style=svg)](https://circleci.com/gh/riddopic/docker-alpine)
 [![](https://images.microbadger.com/badges/image/bluebeluga/alpine.svg)](https://microbadger.com/images/bluebeluga/alpine "Get your own image badge on microbadger.com")
