@@ -36,6 +36,7 @@ TAG = $(VERSION)
 # Detect if we are in a CI pipeline, if so skip checking the working directory.
 ifndef CI
 ifndef CIRCLECI
+TAG_OPTS = -f
 
 # Find out if the working directory is clean.
 GIT_NOT_CLEAN_CHECK = $(shell git status --porcelain)
@@ -154,7 +155,6 @@ all : test
 
 prerequisite:
 	@set -e; mkdir -p $HOME/bin; curl -sSLO $(SIGIL_URL)/$(SIGIL_TGZ)
-	@echo $(SIGIL_SHA)  $(SIGIL_TGZ)
 	@echo $(SIGIL_SHA)  $(SIGIL_TGZ) | sha256sum -c -
 	@tar zxf $(SIGIL_TGZ) -C $(HOME)/bin/
 	@rm -f $(SIGIL_TGZ)
@@ -193,7 +193,7 @@ endif
 push: .banner build test
 	for registry in $(PUSH_REGISTRIES); do \
 		for tag in $(PUSH_TAGS); do \
-			docker tag   $(REGISTRY)/$(REPOSITORY):$(TAG) \
+			docker tag $(TAG_OPTS) $(REGISTRY)/$(REPOSITORY):$(TAG) \
                   $${registry}/$(REPOSITORY):$${tag}; \
 			docker push $${registry}/$(REPOSITORY):$${tag}; \
 		done \
