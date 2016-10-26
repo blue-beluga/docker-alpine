@@ -138,7 +138,7 @@ all : test
 .banner:
 	@printf "$(YELLOW)---------------------------------------------------------\n"
 	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Repository" $(REPOSITORY)
-	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Build Tags" $(PUSH_TAGS)
+	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Build Tags" "$(PUSH_TAGS)"
 	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Registries" $(REGISTRY)
 	@printf "$(YELLOW)---------------------------------------------------------\n"
 
