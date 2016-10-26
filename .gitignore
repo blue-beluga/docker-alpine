@@ -69,5 +69,5 @@ bin/*
 .docker/config.json
 versions/*/Dockerfile
 versions/*/.build_id
-.secret-env-plain
+secret-env-plain
 .envrc
