@@ -1,17 +1,20 @@
 # encoding: UTF-8
 ---
 machine:
+  timezone:
+    America/Los_Angeles
   services:
     - docker
 
+checkout:
+  post:
+    - git submodule sync
+    - git submodule update --init
+
 dependencies:
-  cache_directories:
-    - "~/docker"
   pre:
-    - openssl aes-256-cbc -d -in .env-cipher -k $KEY >> ~/.circlerc
-    - source ~/.circlerc
-  override:
     - make deps
+  override:
     - make build
 
 test:
@@ -22,9 +25,8 @@ deployment:
   master:
     branch: master
     commands:
-      - make deploy_docs
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - make push
+      - make publish
 
 general:
   branches:
