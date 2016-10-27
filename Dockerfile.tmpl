@@ -21,6 +21,7 @@ LABEL org.label-schema.vendor="The Blue Beluga Company" \
 
 COPY files/apk-install /usr/bin/apk-install
 
-RUN apk --no-cache upgrade
+RUN set -x \
+ && apk --no-cache upgrade
 
 ONBUILD RUN apk --no-cache upgrade

@@ -1,7 +1,13 @@
 # encoding: UTF-8
+SHELL := /bin/bash -euo pipefail
 
 # Determines whether the output is in color or not. To disable, set this to 0.
 USE_COLOR = 1
+
+ifdef DEBUG
+  this_file := $(lastword $(MAKEFILE_LIST))
+  $(warning $(this_file))
+endif
 
 ifeq ($(CURDIR),)
   CURDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -120,9 +126,9 @@ export REPOSITORY
 export REGISTRY
 export TAG
 
-CONFIG_JSON = .docker/config.json
-DOCKERFILE  = versions/$(VERSION)/Dockerfile
-BUILD_ID    = versions/$(VERSION)/.build_id
+DOCKER_TAR = $(TAG)/$(REPOSITORY)-$(TAG).tar
+DOCKERFILE = $(TAG)/Dockerfile
+BUILD_ID   = $(TAG)/.build_id
 
 # ******************************************************************************
 # The rule that occurs first in the makefile is the default.
@@ -130,60 +136,40 @@ BUILD_ID    = versions/$(VERSION)/.build_id
 #
 # Calling `make` will invoque the `all` rule.
 # `all` depends on `build` by convention.
-all : deps build test push
-
-# We don't want `make` to get confused if a file named `all` should happen to
-# exist, so we say that `all` is a `PHONY` target, i.e., a target that `make`
-# should always try to update. We do that by making all a dependency of the
-# special target `.PHONY`:
-.PHONY : all build .build_id .banner push test docs clean
-
-$(CONFIG_JSON):
-	@printf "\n$(RED)Decrypt Secrets File $(YELLOW): $(YELLOW)$(CONFIG_JSON)$(NO_COLOR)\n"
-	@openssl aes-256-cbc -d -in $(CONFIG_JSON).enc -out $(CONFIG_JSON) -k $KEY
-
-# Per-tag Dockerfile target. Look for Dockerfile or Dockerfile.tmpl in the root,
-# and use it for $(TAG). We prioritize Dockerfile.tmpl over Dockerfile if
-# both are present.
-$(DOCKERFILE): $(TAG) deps Dockerfile.tmpl Dockerfile
-ifneq (,$(wildcard Dockerfile.tmpl))
-	@bin/sigil -f Dockerfile.tmpl \
-						from=$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG) > $(DOCKERFILE)
-else
-	@cp Dockerfile > $(DOCKERFILE)
-endif
+all : deps build test save push publish
 
 # Print out a header.
-.banner:
+banner:
 	@printf "$(YELLOW)---------------------------------------------------------\n"
 	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Repository" $(REPOSITORY)
 	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Build Tags" "$(PUSH_TAGS)"
 	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Registries" $(REGISTRY)
+	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Credentials" $(CREDENTIALS)
 	@printf "$(YELLOW)---------------------------------------------------------\n"
 
-deps: .banner
+deps: banner
 	@printf "\n$(CYAN)Pulling Image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
 	@docker pull $(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)
 	@printf "\n$(CYAN)Pulling Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
 	@docker pull $(REGISTRY)/$(REPOSITORY):$(TAG)
 
-# `build` depends on `.build_id`, that rule is a bit particular as it actually
+# `build` depends on `.build`, that rule is a bit particular as it actually
 # represent a file on disc. It is used as placeholder to know if we need to
 # redo the build. In a “regular” Makefile scenario, we would have source file
 # instead.
-build: .banner $(DOCKERFILE) .build_id
+build: banner $(DOCKERFILE) .build
 
-# If `.build_id` exists and didn’t change (mtime), then do nothing, otherwise,
+# If `.build` exists and didn’t change (mtime), then do nothing, otherwise,
 # executre the rule.
 #
-# `.build_id` depends on `.`, meaning that if anything (mtime) changes in the
+# `.build` depends on `.`, meaning that if anything (mtime) changes in the
 # local  directory, the rule will be reexecuted (upon next `make` call).
 #
-# The `.build_id` rule, when finish creates the `.build_id` file. So next time
+# The `.build` rule, when finish creates the `.build` file. So next time
 # make is called, nothing will happen unless something changed within the
 # directory.
-.build_id: . deps
-	@printf "\n$(CYAN)Building Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
+.build: . deps
+	@printf "\n$(CYAN)Building image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
 	@docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 								--build-arg VERSION=$(TAG) \
 								--build-arg VCS_URL=`git config --get remote.origin.url` \
@@ -195,33 +181,54 @@ ifeq "$(TAG)" "$(LATEST_TAG)"
 	@docker tag $(TAG_OPTS) $(REGISTRY)/$(REPOSITORY):$(TAG) $(REGISTRY)/$(REPOSITORY):latest
 endif
 
-test: .banner
-	@printf "\n$(CYAN)Testing Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
-	@set -e; if [ -f 'test/run.bats' ]; then bats -p test/run.bats; break; fi
+test: banner
+	@printf "\n$(CYAN)Testing image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
+	@if [ -f 'test/run.bats' ]; then bats -p test/run.bats; break; fi
 
-push: .banner $(CONFIG_JSON)
-	@set -e; for registry in $(PUSH_REGISTRIES); do \
+docker_login:
+	@printf "\n$(CYAN)Docker login $(YELLOW): $(YELLOW)https://index.docker.io/v1/$(NO_COLOR)\n"
+	@bin/push
+
+push: banner docker_login
+	@for registry in $(PUSH_REGISTRIES); do \
 		for tag in $(PUSH_TAGS); do \
-			printf "\n$(CYAN)Pushing Image $(YELLOW): $(YELLOW)$${registry}/$(REPOSITORY):$${tag}$(NO_COLOR)\n"; \
+			printf "\n$(CYAN)Pushing image $(YELLOW): $(YELLOW)$${registry}/$(REPOSITORY):$${tag}$(NO_COLOR)\n"; \
 			docker tag $(TAG_OPTS) $(REGISTRY)/$(REPOSITORY):$(TAG) $${registry}/$(REPOSITORY):$${tag}; \
 			docker push $${registry}/$(REPOSITORY):$${tag}; \
 		done \
 	done
 
-clean: .banner
-	@printf "\n$(CYAN)Cleaning Image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
-	@rm -f $(DOCKERFILE) $(BUILD_ID) $(CONFIG_JSON)
-	@docker images -qa $(REPOSITORY):$(TAG) | xargs docker rmi -f
-	@docker images -qa $(REPOSITORY):latest | xargs docker rmi -f
+save:
+	@printf "\n$(CYAN)Generate ar archive $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
+  # @docker save -o sample-webapp.tar $(REGISTRY)/$(REPOSITORY):$(TAG)
 
 serve_docs:
 	@printf "\n$(CYAN)Render docs $(YELLOW): $(YELLOW)http://localhost:8000$(NO_COLOR)\n"
 	@docker run --rm -p 8000:8000 -v $PWD:/work bluebeluga/mkdocs mkdocs serve
 
-deploy_docs:
-	@printf "\n$(CYAN)Render docs $(YELLOW): $(YELLOW)http://localhost:8000$(NO_COLOR)\n"
+publish:
+	@printf "\n$(CYAN)Publish docs $(YELLOW): $(YELLOW)http://blue-beluga.github.io/docker-alpine/latest$(NO_COLOR)\n"
 ifneq ($(CI), $(CIRCLECI))
   @eval $(docker run bluebeluga/mkdocs circleci-cmd)
+endif
+
+clean: banner
+	@printf "\n$(CYAN)Cleaning image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
+	@rm -f versions/*/Dockerfile \
+				 versions/*/.build_id \
+				 versions/*/$(REPOSITORY)-*.tar
+	@docker images -qa $(REPOSITORY):$(TAG) | xargs docker rmi -f
+	@docker images -qa $(REPOSITORY):latest | xargs docker rmi -f
+
+# Per-tag Dockerfile target. Look for Dockerfile or Dockerfile.tmpl in the root,
+# and use it for $(TAG). We prioritize Dockerfile.tmpl over Dockerfile if
+# both are present.
+versions/$(TAG)/Dockerfile: Dockerfile.tmpl Dockerfile | $(TAG)
+ifneq (,$(wildcard Dockerfile.tmpl))
+	@bin/sigil -f Dockerfile.tmpl \
+						from=$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG) > $(DOCKERFILE)
+else
+	@cp Dockerfile > $(DOCKERFILE)
 endif
 
 # Pseudo targets for Dockerfile and Dockerfile.tmpl. They don't technically
@@ -239,6 +246,12 @@ endif
 
 $(TAG):
 	@mkdir -p versions/$(VERSION)
+
+# We don't want `make` to get confused if a file named `all` should happen to
+# exist, so we say that `all` is a `PHONY` target, i.e., a target that `make`
+# should always try to update. We do that by making all a dependency of the
+# special target `.PHONY`:
+.PHONY : all banner deps build .build test docker_login push clean save serve_docs publish
 
 # Calling `make` will invoque the `all` rule.
 .DEFAULT_GOAL := all

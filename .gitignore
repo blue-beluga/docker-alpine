@@ -66,5 +66,5 @@ bin/*
 #### Ignore build cruft and secrets ###
 versions/*/Dockerfile
 versions/*/.build_id
-.docker/config.json
+.docker/config.env
 .envrc
