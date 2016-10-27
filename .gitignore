@@ -57,17 +57,14 @@ tramp
 /elpa/
 *.rel
 /auto/
+*.swp
 
-# Bundler
+#### Bundler ###
 bin/*
 .bundle/*
 
-###
-# Ignore build cruft and secrets
-###
-*.swp
-.docker/config.json
+#### Ignore build cruft and secrets ###
 versions/*/Dockerfile
 versions/*/.build_id
-secret-env-plain
+.docker/config.json
 .envrc
