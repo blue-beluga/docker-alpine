@@ -126,9 +126,8 @@ export REPOSITORY
 export REGISTRY
 export TAG
 
-DOCKER_TAR = $(TAG)/$(REPOSITORY)-$(TAG).tar
-DOCKERFILE = $(TAG)/Dockerfile
-BUILD_ID   = $(TAG)/.build_id
+DOCKERFILE = versions/$(VERSION)/Dockerfile
+BUILD_ID = versions/$(VERSION)/.build_id
 
 # ******************************************************************************
 # The rule that occurs first in the makefile is the default.
@@ -136,7 +135,7 @@ BUILD_ID   = $(TAG)/.build_id
 #
 # Calling `make` will invoque the `all` rule.
 # `all` depends on `build` by convention.
-all : deps build test save push publish
+all : deps build test push publish
 
 # Print out a header.
 banner:
@@ -183,11 +182,11 @@ endif
 
 test: banner
 	@printf "\n$(CYAN)Testing image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
-	@if [ -f 'test/run.bats' ]; then bats -p test/run.bats; break; fi
+	@test/run
 
 docker_login:
 	@printf "\n$(CYAN)Docker login $(YELLOW): $(YELLOW)https://index.docker.io/v1/$(NO_COLOR)\n"
-	@bin/push
+	@bin/login
 
 push: banner docker_login
 	@for registry in $(PUSH_REGISTRIES); do \
@@ -197,10 +196,6 @@ push: banner docker_login
 			docker push $${registry}/$(REPOSITORY):$${tag}; \
 		done \
 	done
-
-save:
-	@printf "\n$(CYAN)Generate ar archive $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
-  # @docker save -o sample-webapp.tar $(REGISTRY)/$(REPOSITORY):$(TAG)
 
 serve_docs:
 	@printf "\n$(CYAN)Render docs $(YELLOW): $(YELLOW)http://localhost:8000$(NO_COLOR)\n"
@@ -225,8 +220,7 @@ clean: banner
 # both are present.
 versions/$(TAG)/Dockerfile: Dockerfile.tmpl Dockerfile | $(TAG)
 ifneq (,$(wildcard Dockerfile.tmpl))
-	@bin/sigil -f Dockerfile.tmpl \
-						from=$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG) > $(DOCKERFILE)
+	@bin/sigil -f Dockerfile.tmpl from=$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG) > $(DOCKERFILE)
 else
 	@cp Dockerfile > $(DOCKERFILE)
 endif
@@ -251,7 +245,7 @@ $(TAG):
 # exist, so we say that `all` is a `PHONY` target, i.e., a target that `make`
 # should always try to update. We do that by making all a dependency of the
 # special target `.PHONY`:
-.PHONY : all banner deps build .build test docker_login push clean save serve_docs publish
+.PHONY : all banner deps build .build test docker_login push clean serve_docs publish
 
 # Calling `make` will invoque the `all` rule.
 .DEFAULT_GOAL := all

@@ -1,8 +1,6 @@
 #!/usr/bin/env bats
 
-setup() {
-  docker history $REGISTRY/$REPOSITORY:$TAG >/dev/null 2>&1
-}
+load test_helper
 
 @test "version is correct" {
   run docker run $REGISTRY/$REPOSITORY:$TAG cat /etc/os-release
@@ -19,9 +17,15 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
-@test "package installs cleanly" {
-  run docker run $REGISTRY/$REPOSITORY:$TAG apk add --update openssl
-  [ $status -eq 0 ]
+@test "git installs cleanly" {
+  run docker run $REGISTRY/$REPOSITORY:$TAG apk add --update git
+  [ "$status" -eq 0 ]
+}
+
+@test "git executes correctly" {
+  run docker run $REGISTRY/$REPOSITORY:$TAG sh -c \
+    "apk add --update git && git --version"
+  [ "$status" -eq 0 ]
 }
 
 @test "timezone set to UTC" {
@@ -56,6 +60,18 @@ setup() {
 @test "cache is empty" {
   run docker run $REGISTRY/$REPOSITORY:$TAG sh -c "ls -1 /var/cache/apk | wc -l"
   [ $status -eq 0 ]
+}
+
+@test "current user" {
+  run docker run $REGISTRY/$REPOSITORY:$TAG whoami
+  [ $status -eq 0 ]
+  [ "$output" = "root" ]
+}
+
+@test "network connectivity" {
+  run ping -c 1 google.com
+  [ "$status" -eq 0 ]
+  [ "${lines[3]}" = "1 packets transmitted, 1 packets received, 0.0% packet loss" ]
 }
 
 @test "root password is disabled" {
