@@ -60,7 +60,6 @@ tramp
 *.swp
 
 #### Bundler ###
-bin/*
 .bundle/*
 
 #### Ignore build cruft and secrets ###

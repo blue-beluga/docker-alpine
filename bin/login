@@ -1,0 +1,4 @@
+#!/bin/sh
+
+eval $(openssl aes-256-cbc -d -in .docker/config.aes -k $KEY)
+docker login -u $DOCKER_USER -p $DOCKER_PASS
