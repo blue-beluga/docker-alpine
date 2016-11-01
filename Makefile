@@ -19,9 +19,10 @@ endif
 
 # Colors
 ifneq ($(USE_COLOR),0)
-  YELLOW   = \033[0;33m
-  GREEN    = \033[0;32m
   RED      = \033[0;31m
+  GREEN    = \033[0;32m
+  YELLOW   = \033[0;33m
+  BLUE     = \033[0;34m
   MAGENTA  = \033[0;35m
   CYAN     = \033[0;36m
   NO_COLOR = \033[0m
@@ -33,7 +34,7 @@ GIT_COMMIT = $(strip $(shell git rev-parse --short HEAD))
 # Get the version number from the code.
 VERSION = $(strip $(shell cat VERSION))
 ifndef VERSION
-	$(error echo You need to create a VERSION file to build a release)
+	$(error You need to create a VERSION file to build a release)
 endif
 
 # Use the version number as the release tag.
@@ -41,7 +42,7 @@ TAG = $(VERSION)
 
 # Detect if we are in a CI pipeline, if so skip checking the working directory.
 ifneq ($(CI), $(CIRCLECI))
-  TAG_OPTS = -f
+  TAG_OPTIONS = -f
   # Find out if the working directory is clean.
   GIT_NOT_CLEAN_CHECK = $(shell git status --porcelain)
 
@@ -56,12 +57,13 @@ ifeq ($(MAKECMDGOALS), push)
   VERSION_COMMIT = $(strip $(shell git rev-list $(TAG) -n 1 | cut -c1-7))
 
 ifneq ($(VERSION_COMMIT), $(GIT_COMMIT))
-  $(error echo You are trying to push a build based on commit '$(GIT_COMMIT)' but the tagged release version is '$(VERSION_COMMIT)')
+  $(error You are trying to push a build based on commit '$(GIT_COMMIT)' \
+  but the tagged release version is '$(VERSION_COMMIT)')
 endif
 
 # Don't push to Docker Hub if this isn't a clean repo.
 ifneq (x$(GIT_NOT_CLEAN_CHECK), x)
-  $(error echo You are trying to release a build based on a dirty repo)
+  $(error You are trying to release a build based on a dirty repo)
 endif
 
 else
@@ -77,7 +79,7 @@ endif # ifneq ($(CI), $(CIRCLECI))
 include latest.mk
 
 ifndef LATEST_TAG
-  $(error echo The LATEST_TAG *must* be set in latest.mk)
+  $(error The LATEST_TAG *must* be set in latest.mk)
 endif
 
 ifeq "$(TAG)" "latest"
@@ -94,11 +96,11 @@ TAG ?= $(LATEST_TAG)
 include config.mk
 
 ifndef REGISTRY
-  $(error echo The REGISTRY *must* be set in config.mk)
+  $(error The REGISTRY *must* be set in config.mk)
 endif
 
 ifndef REPOSITORY
-  $(error echo The REPOSITORY *must* be set in config.mk)
+  $(error The REPOSITORY *must* be set in config.mk)
 endif
 
 # Create $(TAG)/config.mk if you need to e.g. set environment variables
@@ -129,6 +131,18 @@ export TAG
 DOCKERFILE = versions/$(VERSION)/Dockerfile
 BUILD_ID = versions/$(VERSION)/.build_id
 
+define banner
+	@printf "$(YELLOW)---------------------------------------------------------\n"
+	@printf "$(CYAN)%13s: $(GREEN)%-15s\n" "Repository" "$(REPOSITORY)"
+	@printf "$(CYAN)%13s: $(GREEN)%-15s\n" "Build Tags" "$(PUSH_TAGS)"
+	@printf "$(CYAN)%13s: $(GREEN)%-15s\n" "Registries" "$(REGISTRY)"
+	@printf "$(YELLOW)---------------------------------------------------------\n"
+endef
+
+define say
+  @printf "\n$(CYAN)$(1): $(YELLOW)$(2)$(NO_COLOR)\n"
+endef
+
 # ******************************************************************************
 # The rule that occurs first in the makefile is the default.
 # By default, we want to build everything.
@@ -139,17 +153,12 @@ all : deps build test push publish
 
 # Print out a header.
 banner:
-	@printf "$(YELLOW)---------------------------------------------------------\n"
-	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Repository" $(REPOSITORY)
-	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Build Tags" "$(PUSH_TAGS)"
-	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Registries" $(REGISTRY)
-	@printf "$(CYAN)%13s $(YELLOW): $(GREEN)%-15s\n" "Credentials" $(CREDENTIALS)
-	@printf "$(YELLOW)---------------------------------------------------------\n"
+	$(call banner)
 
 deps: banner
-	@printf "\n$(CYAN)Pulling Image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
+	$(call say,Pulling Image,$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG))
 	@docker pull $(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)
-	@printf "\n$(CYAN)Pulling Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
+	$(call say,Pulling Image,$(REGISTRY)/$(REPOSITORY):$(TAG))
 	@docker pull $(REGISTRY)/$(REPOSITORY):$(TAG)
 
 # `build` depends on `.build`, that rule is a bit particular as it actually
@@ -168,47 +177,51 @@ build: banner $(DOCKERFILE) .build
 # make is called, nothing will happen unless something changed within the
 # directory.
 .build: . deps
-	@printf "\n$(CYAN)Building image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
+	$(call say,Building image,$(REGISTRY)/$(REPOSITORY):$(TAG))
 	@docker build --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 								--build-arg VERSION=$(TAG) \
 								--build-arg VCS_URL=`git config --get remote.origin.url` \
 								--build-arg VCS_REF=$(GIT_COMMIT) \
 								--tag	$(REGISTRY)/$(REPOSITORY):$(TAG) \
 								--file $(DOCKERFILE) .
-	@docker inspect --format '{{.Id}}' $(REGISTRY)/$(REPOSITORY):$(TAG) > $(BUILD_ID)
+	@docker inspect --format '{{.Id}}' \
+                             $(REGISTRY)/$(REPOSITORY):$(TAG) > $(BUILD_ID)
 ifeq "$(TAG)" "$(LATEST_TAG)"
-	@docker tag $(TAG_OPTS) $(REGISTRY)/$(REPOSITORY):$(TAG) $(REGISTRY)/$(REPOSITORY):latest
+	@docker tag $(TAG_OPTIONS) $(REGISTRY)/$(REPOSITORY):$(TAG) \
+                             $(REGISTRY)/$(REPOSITORY):latest
 endif
 
 test: banner
-	@printf "\n$(CYAN)Testing image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
-	@test/run
+	$(call say,Testing image,$(REGISTRY)/$(REPOSITORY):$(TAG))
+	@bin/test
 
 docker_login:
-	@printf "\n$(CYAN)Docker login $(YELLOW): $(YELLOW)https://index.docker.io/v1/$(NO_COLOR)\n"
+	$(call say,Docker login,https://index.docker.io)
 	@bin/login
 
 push: banner docker_login
 	@for registry in $(PUSH_REGISTRIES); do \
 		for tag in $(PUSH_TAGS); do \
-			printf "\n$(CYAN)Pushing image $(YELLOW): $(YELLOW)$${registry}/$(REPOSITORY):$${tag}$(NO_COLOR)\n"; \
-			docker tag $(TAG_OPTS) $(REGISTRY)/$(REPOSITORY):$(TAG) $${registry}/$(REPOSITORY):$${tag}; \
+			printf "\n$(CYAN)Pushing image: "; \
+			printf "$(YELLOW)$${registry}/$(REPOSITORY):$${tag}$(NO_COLOR)\n"; \
+			docker tag $(TAG_OPTIONS) $(REGISTRY)/$(REPOSITORY):$(TAG) \
+                 $${registry}/$(REPOSITORY):$${tag}; \
 			docker push $${registry}/$(REPOSITORY):$${tag}; \
 		done \
 	done
 
-serve_docs:
-	@printf "\n$(CYAN)Render docs $(YELLOW): $(YELLOW)http://localhost:8000$(NO_COLOR)\n"
+docs:
+	$(call say,Render docs,http://localhost:8000)
 	@docker run --rm -p 8000:8000 -v $PWD:/work bluebeluga/mkdocs mkdocs serve
 
 publish:
-	@printf "\n$(CYAN)Publish docs $(YELLOW): $(YELLOW)http://blue-beluga.github.io/docker-alpine/latest$(NO_COLOR)\n"
 ifneq ($(CI), $(CIRCLECI))
+	$(call say,Publish docs,http://blue-beluga.github.io/docker-alpine/latest)
   @eval $(docker run bluebeluga/mkdocs circleci-cmd)
 endif
 
 clean: banner
-	@printf "\n$(CYAN)Cleaning image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
+	$(call say,Cleaning image,$(REGISTRY)/$(REPOSITORY):$(TAG))
 	@rm -f versions/*/Dockerfile \
 				 versions/*/.build_id \
 				 versions/*/$(REPOSITORY)-*.tar
@@ -246,7 +259,7 @@ $(TAG):
 # exist, so we say that `all` is a `PHONY` target, i.e., a target that `make`
 # should always try to update. We do that by making all a dependency of the
 # special target `.PHONY`:
-.PHONY : all banner deps build .build test docker_login push clean serve_docs publish
+.PHONY : all banner deps build .build test docker_login push clean docs publish
 
 # Calling `make` will invoque the `all` rule.
 .DEFAULT_GOAL := all
