@@ -147,10 +147,6 @@ banner:
 	@printf "$(YELLOW)---------------------------------------------------------\n"
 
 deps: banner
-ifeq (,$(wildcard /usr/local/bin/sigil))
-	@printf "\n$(CYAN)Installing sigil $(YELLOW): $(YELLOW)/usr/local/bin/sigil$(NO_COLOR)\n"
-	@wget -qO- https://github.com/gliderlabs/sigil/releases/download/v0.4.0/sigil_0.4.0_$(uname -sm|tr \  _).tgz | tar xvz -C ~/bin
-endif
 	@printf "\n$(CYAN)Pulling Image $(YELLOW): $(YELLOW)$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)$(NO_COLOR)\n"
 	@docker pull $(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)
 	@printf "\n$(CYAN)Pulling Image $(YELLOW): $(YELLOW)$(REGISTRY)/$(REPOSITORY):$(TAG)$(NO_COLOR)\n"
@@ -224,8 +220,8 @@ clean: banner
 # both are present.
 versions/$(TAG)/Dockerfile: Dockerfile.tmpl Dockerfile | $(TAG)
 ifneq (,$(wildcard Dockerfile.tmpl))
-	@m4 -D__from__="$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)" \
-        Dockerfile.in > $(DOCKERFILE)
+	@from=$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG) \
+    bin/render Dockerfile.tmpl > $(DOCKERFILE)
 else
 	@cp Dockerfile > $(DOCKERFILE)
 endif
