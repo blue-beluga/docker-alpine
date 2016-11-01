@@ -68,12 +68,6 @@ load test_helper
   [ "$output" = "root" ]
 }
 
-@test "network connectivity" {
-  run ping -c 1 google.com
-  [ "$status" -eq 0 ]
-  [ "${lines[3]}" = "1 packets transmitted, 1 packets received, 0.0% packet loss" ]
-}
-
 @test "root password is disabled" {
   run docker run --user nobody $REGISTRY/$REPOSITORY:$TAG su
   [ $status -eq 1 ]
