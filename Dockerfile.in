@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-FROM       {{ $from }}
+FROM       __from__
 MAINTAINER The Blue Beluga Company <admin@bluebeluga.io>
 
 ARG VCS_REF

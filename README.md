@@ -7,6 +7,7 @@
 [![CircleCI](https://circleci.com/gh/riddopic/docker-alpine.svg?style=svg)](https://circleci.com/gh/riddopic/docker-alpine)
 [![](https://images.microbadger.com/badges/image/bluebeluga/alpine.svg)](https://microbadger.com/images/bluebeluga/alpine "Get your own image badge on microbadger.com")
 [![](https://images.microbadger.com/badges/version/bluebeluga/alpine.svg)](https://microbadger.com/images/bluebeluga/alpine "Get your own version badge on microbadger.com")
+[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
 A minimalist [Alpine Linux](http://alpinelinux.org/) container.
 
