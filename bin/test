@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
 set -e
 
-export TAG=3.4
-export REGISTRY=docker.io
-export REPOSITORY=bluebeluga/alpine
-
 exec bats ${CI:+--tap} test

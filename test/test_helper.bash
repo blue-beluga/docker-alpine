@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 setup() {
+  export TAG=3.4
+  export REGISTRY=docker.io
+  export REPOSITORY=bluebeluga/alpine
   docker history $REGISTRY/$REPOSITORY:$TAG >/dev/null 2>&1
 }
 
