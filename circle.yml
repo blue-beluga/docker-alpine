@@ -1,15 +1,8 @@
 # encoding: UTF-8
 ---
 machine:
-  timezone:
-    America/Los_Angeles
   services:
     - docker
-
-checkout:
-  post:
-    - git submodule sync
-    - git submodule update --init
 
 dependencies:
   pre:
