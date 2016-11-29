@@ -65,6 +65,7 @@ tramp
 #### Ignore build cruft and secrets ###
 versions/*/Dockerfile
 versions/*/.build_id
+versions/*/.test.cid
 .docker/config.env
 .envrc
 

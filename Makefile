@@ -129,7 +129,8 @@ export REGISTRY
 export TAG
 
 DOCKERFILE = versions/$(VERSION)/Dockerfile
-BUILD_ID = versions/$(VERSION)/.build_id
+BUILD_ID   = versions/$(VERSION)/.build_id
+CIDFILE    = versions/$(VERSION)/.test_id
 
 define banner
 	@printf "$(YELLOW)---------------------------------------------------------\n"
@@ -141,6 +142,23 @@ endef
 
 define say
   @printf "\n$(CYAN)$(1): $(YELLOW)$(2)$(NO_COLOR)\n"
+endef
+
+define run_container
+	@rm -f $(CIDFILE)
+	@docker run -d --cidfile $(CIDFILE) $(REGISTRY)/$(REPOSITORY):$(TAG) sleep 180
+endef
+
+define kill_container
+	@docker kill `cat $(CIDFILE)`
+	@rm -f $(CIDFILE)
+endef
+
+define test_container
+	@docker run -it --rm -v $(CURDIR):/share \
+							-v /var/run/docker.sock:/var/run/docker.sock \
+							chef/inspec exec test/ --format=doc \
+							-t docker://`cat $(CIDFILE)`
 endef
 
 # ******************************************************************************
@@ -195,9 +213,9 @@ endif
 
 test: banner
 	$(call say,Testing image,$(REGISTRY)/$(REPOSITORY):$(TAG))
-	@docker run -it --rm -v $(CURDIR):/share \
-							-v /var/run/docker.sock:/var/run/docker.sock \
-							chef/inspec exec test/ -t docker://ae82058bb8b0 --format=progress
+	$(call run_container)
+	$(call test_container)
+	$(call kill_container)
 
 docker_login:
 	$(call say,Docker login,https://index.docker.io)
@@ -228,6 +246,7 @@ clean: banner
 	$(call say,Cleaning image,$(REGISTRY)/$(REPOSITORY):$(TAG))
 	@rm -f versions/*/Dockerfile \
 				 versions/*/.build_id \
+				 versions/*/.test_id \
 				 versions/*/$(REPOSITORY)-*.tar
 	@docker images -qa $(REPOSITORY):$(TAG) | xargs docker rmi -f
 	@docker images -qa $(REPOSITORY):latest | xargs docker rmi -f
