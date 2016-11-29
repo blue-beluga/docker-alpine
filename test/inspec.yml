@@ -1,0 +1,11 @@
+# encoding: UTF-8
+name: bluebeluga-default
+title: The BlueBeluga Hardening Suite Test Framework
+maintainer: The Blue Beluga Company
+copyright: The Blue Beluga Company
+copyright_email: nospam@bluebeluga.io
+license: MIT
+summary: Test-suite for BlueBeluga hardend images
+version: 1.0.0
+supports:
+  - os-family: unix

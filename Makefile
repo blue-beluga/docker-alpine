@@ -160,6 +160,8 @@ deps: banner
 	@docker pull $(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)
 	$(call say,Pulling Image,$(REGISTRY)/$(REPOSITORY):$(TAG))
 	@docker pull $(REGISTRY)/$(REPOSITORY):$(TAG)
+	$(call say,Pulling Image,chef/inspec)
+	@docker pull chef/inspec
 
 # `build` depends on `.build`, that rule is a bit particular as it actually
 # represent a file on disc. It is used as placeholder to know if we need to
@@ -193,7 +195,9 @@ endif
 
 test: banner
 	$(call say,Testing image,$(REGISTRY)/$(REPOSITORY):$(TAG))
-	@bin/test
+	@docker run -it --rm -v $(CURDIR):/share \
+							-v /var/run/docker.sock:/var/run/docker.sock \
+							chef/inspec exec test/ -t docker://ae82058bb8b0 --format=progress
 
 docker_login:
 	$(call say,Docker login,https://index.docker.io)

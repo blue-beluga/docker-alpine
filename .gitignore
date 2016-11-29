@@ -67,3 +67,6 @@ versions/*/Dockerfile
 versions/*/.build_id
 .docker/config.env
 .envrc
+
+#### Inspec lockfile ###
+inspec.lock
