@@ -37,7 +37,7 @@ control 'alpine-01' do
   end
 
   describe os.release do
-    it { should eq '3.4.4' }
+    it { should eq '3.4.6' }
   end
 end
 
@@ -57,7 +57,7 @@ control 'alpine-02' do
   end
 end
 
-control 'etc-03' do
+control 'alpine-03' do
   impact 1.0
   title 'The /etc/os-release file must exist'
   desc 'Check periodically the owner and permissions for /etc/os-release.'
@@ -67,7 +67,7 @@ control 'etc-03' do
   end
 end
 
-control 'etc-04' do
+control 'alpine-04' do
   impact 1.0
   title 'The /etc/os-release file must be the correct type'
   desc 'Check periodically the owner and permissions for /etc/os-release.'
@@ -135,12 +135,12 @@ control 'alpine-08' do
   describe file('/etc/os-release') do
     its('content') { should match /^NAME="Alpine Linux"$/ }
     its('content') { should match /^ID=alpine$/ }
-    its('content') { should match /^VERSION_ID=3.4.4$/ }
+    its('content') { should match /^VERSION_ID=3.4.6$/ }
     its('content') { should match /^PRETTY_NAME="Alpine Linux v3.4"$/ }
   end
 end
 
-control 'etc-09' do
+control 'alpine-09' do
   impact 1.0
   title 'The /etc/alpine-release file must exist'
   desc 'Ensure that the correct release of Alpine Linux is used.'
@@ -150,7 +150,7 @@ control 'etc-09' do
   end
 end
 
-control 'etc-10' do
+control 'alpine-10' do
   impact 1.0
   title 'The /etc/alpine-release file must be the correct type'
   desc 'Ensure that the correct release of Alpine Linux is used.'
@@ -216,11 +216,11 @@ control 'alpine-14' do
   desc 'Check for the correct version of Alpine Linux from /etc/alpine-release.'
 
   describe file('/etc/alpine-release') do
-    its('content') { should match /^3.4.4$/ }
+    its('content') { should match /^3.4.6$/ }
   end
 end
 
-control 'etc-15' do
+control 'alpine-15' do
   impact 1.0
   title 'The /etc/apk/repositories file must exist'
   desc 'Check periodically the owner and permissions for /etc/apk/repositories.'
@@ -230,7 +230,7 @@ control 'etc-15' do
   end
 end
 
-control 'etc-16' do
+control 'alpine-16' do
   impact 1.0
   title 'The /etc/apk/repositories file must be the correct type'
   desc 'Check periodically the owner and permissions for /etc/apk/repositories.'

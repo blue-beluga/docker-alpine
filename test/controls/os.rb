@@ -411,7 +411,7 @@ control 'os-23' do
 
   describe command('apk info -v | grep ^libssl | cut -d- -f2-') do
     its('exit_status') { should eq 0 }
-    its('stdout') { should match /^1.0.2j-r0$/ }
+    its('stdout') { should match /^1.0.2k-r0$/ }
     its('stderr') { should eq '' }
   end
 end

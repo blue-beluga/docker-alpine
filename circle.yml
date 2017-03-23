@@ -1,27 +1,50 @@
 # encoding: UTF-8
 ---
 machine:
+  ruby:
+    version: 2.3.1
   services:
     - docker
+  environment:
+    FROM_REGISTRY: docker.io
+    FROM_REPOSITORY: alpine
+    FROM_TAG: '3.4'
+    REGISTRY: docker.io
+    REPOSITORY: bluebeluga/alpine
+    TAG: '3.4'
 
 dependencies:
+  cache_directories:
+    - "~/docker"
   pre:
-    - make deps
+    - |
+      ssh-keygen -f ~/.ssh/id_rsa -q -N ""
+    	docker pull $(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)
+    	docker pull $(REGISTRY)/$(REPOSITORY):$(TAG)
+    	docker pull chef/inspec
   override:
-    - make build
+    - |
+      make build
 
 test:
   override:
-    - make test
+    - |
+      docker run -d --cidfile .cid $(REGISTRY)/$(REPOSITORY):$(TAG) sleep 180
+	    docker run -it --rm -v $(CURDIR):/share \
+				-v /var/run/docker.sock:/var/run/docker.sock \
+				chef/inspec exec test/ --format=doc \
+				-t docker://$(cat .cid)
 
 deployment:
-  master:
+  production:
     branch: master
     commands:
-      - make push
-      - make publish
+      - |
+        make push
+        make publish
 
 general:
+  build_dir: app
   branches:
     ignore:
       - gh-pages

@@ -176,8 +176,6 @@ banner:
 deps: banner
 	$(call say,Pulling Image,$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG))
 	@docker pull $(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)
-	$(call say,Pulling Image,$(REGISTRY)/$(REPOSITORY):$(TAG))
-	@docker pull $(REGISTRY)/$(REPOSITORY):$(TAG)
 	$(call say,Pulling Image,chef/inspec)
 	@docker pull chef/inspec
 
