@@ -8,10 +8,10 @@ machine:
   environment:
     FROM_REGISTRY: docker.io
     FROM_REPOSITORY: alpine
-    FROM_TAG: '3.4'
+    FROM_TAG: '3.5'
     REGISTRY: docker.io
     REPOSITORY: bluebeluga/alpine
-    TAG: '3.4'
+    TAG: '3.5'
 
 dependencies:
   cache_directories:

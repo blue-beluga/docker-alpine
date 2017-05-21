@@ -2,7 +2,7 @@
 
 export FROM_REGISTRY=docker.io
 export FROM_REPOSITORY=alpine
-export FROM_TAG=3.4
+export FROM_TAG=3.5
 
 REGISTRY=docker.io
 REPOSITORY=bluebeluga/alpine
