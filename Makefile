@@ -157,7 +157,7 @@ endef
 define test_container
 	@docker run -i --rm -v $(CURDIR):/share \
 							-v /var/run/docker.sock:/var/run/docker.sock \
-							chef/inspec exec test/ --format=doc \
+							chef/inspec exec test --format=doc \
 							-t docker://`cat $(CIDFILE)`
 endef
 
