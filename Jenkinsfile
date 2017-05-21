@@ -26,5 +26,13 @@ pipeline {
         }
       }
     }
+
+    stage('Push Alpine') {
+      steps {
+        ansiColor('xterm') {
+          sh "make push"
+        }
+      }
+    }
   }
 }
