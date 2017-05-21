@@ -210,9 +210,11 @@ ifeq "$(TAG)" "$(LATEST_TAG)"
 endif
 
 test: banner
-	$(call say,Testing image,$(REGISTRY)/$(REPOSITORY):$(TAG))
+	$(call say,Running image,$(REGISTRY)/$(REPOSITORY):$(TAG))
 	$(call run_container)
+	$(call say,Testing image,$(REGISTRY)/$(REPOSITORY):$(TAG))
 	$(call test_container)
+	$(call say,Stopping image,$(REGISTRY)/$(REPOSITORY):$(TAG))
 	$(call kill_container)
 
 docker_login:
