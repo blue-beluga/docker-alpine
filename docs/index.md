@@ -28,7 +28,7 @@ A contains should only contain the OS libraries and language dependencies requir
 Rather than starting with everything but the kitchen sink, start with the **bare minimum and add dependencies** on an as needed basis.
 
 ```
-FROM bluebeluga/alpine:3.4
+FROM bluebeluga/alpine:3.5
 RUN apk add --update dnsmasq \
  && rm -rf /var/cache/apk/*
 EXPOSE 53 53/udp
@@ -42,7 +42,7 @@ We now have a very small container with only the dependencies we need. Nothing m
 As of Alpine Linux 3.3 there exists a new `--no-cache` option for `apk`. It allows users to install packages with an index that is updated and used on-the-fly and not cached locally:
 
 ```
-FROM bluebeluga/alpine:3.4
+FROM bluebeluga/alpine:3.5
 RUN apk --no-cache add dnsmasq
 EXPOSE 53 53/udp
 ENTRYPOINT ["dnsmasq", "-k"]
@@ -55,7 +55,7 @@ This avoids the need to use `--update` and remove `/var/cache/apk/*` when done i
 This image contains a wrapper script that assists in the cleanup of the package index after installing packages. Here is another simple `Dockerfile` that installs the `nginx` package and removes package index data:
 
 ```
-FROM bluebeluga/alpine:3.4
+FROM bluebeluga/alpine:3.5
 RUN apk-install nginx
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
@@ -66,7 +66,7 @@ CMD ["nginx", "-g", "daemon off;"]
 Another great apk add feature for cleanup is the concept of virtual packages using the `--virtual` or `-t` switch. Packages added under this virtual name can then be removed as one group. An example use of this would be removing a group of build dependencies all at once:
 
 ```
-FROM bluebeluga/alpine:3.4
+FROM bluebeluga/alpine:3.5
 RUN apk --update add python py-pip openssl ca-certificates
 RUN apk --update add --virtual build-dependencies python-dev build-base wget \
   && pip install -r requirements.txt \
@@ -77,10 +77,11 @@ CMD ["myapp", "start"]
 
 ## Available Tags
 
-* `latest`: **Currently 3.4**
+* `latest`: **Currently 3.5**
 * `3.2`:
 * `3.3`:
 * `3.4`
+* `3.5`
 * `edge`:
 
 ## Build

@@ -387,7 +387,7 @@ control 'os-21' do
 
   describe command('git --version') do
     its('exit_status') { should eq 0 }
-    its('stdout') { should match /^git version 2.8.3$/ }
+    its('stdout') { should match /^git version 2.11.2$/ }
     its('stderr') { should eq '' }
   end
 end
@@ -406,18 +406,6 @@ end
 
 control 'os-23' do
   impact 1.0
-  title 'Resolve CVE-2016-2183, CVE-2016-6304, CVE-2016-6306, CVE-2016-7052'
-  desc 'Check that the system is protected with latest security updates.'
-
-  describe command('apk info -v | grep ^libssl | cut -d- -f2-') do
-    its('exit_status') { should eq 0 }
-    its('stdout') { should match /^1.0.2k-r0$/ }
-    its('stderr') { should eq '' }
-  end
-end
-
-control 'os-24' do
-  impact 1.0
   title 'Dot in PATH variable'
   desc 'Do not include the current working directory in PATH variable.'
 
@@ -427,7 +415,7 @@ control 'os-24' do
   end
 end
 
-control 'os-25' do
+control 'os-24' do
   impact 1.0
   title 'Check for SUID/SGID blacklist'
   desc 'Find blacklisted SUID/SGID files to ensure they are removed.'
@@ -468,7 +456,7 @@ control 'os-25' do
   end
 end
 
-control 'os-26' do
+control 'os-25' do
   impact 0.5
   title 'OpenSSH must not be running'
   desc 'OpenSSH must not be running.'

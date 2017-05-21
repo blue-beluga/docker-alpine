@@ -37,7 +37,7 @@ control 'alpine-01' do
   end
 
   describe os.release do
-    it { should eq '3.4.6' }
+    it { should eq '3.5.2' }
   end
 end
 
@@ -135,8 +135,8 @@ control 'alpine-08' do
   describe file('/etc/os-release') do
     its('content') { should match /^NAME="Alpine Linux"$/ }
     its('content') { should match /^ID=alpine$/ }
-    its('content') { should match /^VERSION_ID=3.4.6$/ }
-    its('content') { should match /^PRETTY_NAME="Alpine Linux v3.4"$/ }
+    its('content') { should match /^VERSION_ID=3.5.2$/ }
+    its('content') { should match /^PRETTY_NAME="Alpine Linux v3.5"$/ }
   end
 end
 
@@ -216,7 +216,7 @@ control 'alpine-14' do
   desc 'Check for the correct version of Alpine Linux from /etc/alpine-release.'
 
   describe file('/etc/alpine-release') do
-    its('content') { should match /^3.4.6$/ }
+    its('content') { should match /^3.5.2$/ }
   end
 end
 
@@ -297,11 +297,11 @@ control 'alpine-20' do
 
   describe file('/etc/apk/repositories') do
     its('content') {
-      should match /^http:\/\/dl-cdn.alpinelinux.org\/alpine\/v3.4\/main$/
+      should match /^http:\/\/dl-cdn.alpinelinux.org\/alpine\/v3.5\/main$/
     }
 
     its('content') {
-      should match /^http:\/\/dl-cdn.alpinelinux.org\/alpine\/v3.4\/community$/
+      should match /^http:\/\/dl-cdn.alpinelinux.org\/alpine\/v3.5\/community$/
     }
   end
 end
