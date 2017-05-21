@@ -63,9 +63,7 @@ tramp
 .bundle/*
 
 #### Ignore build cruft and secrets ###
-versions/*/Dockerfile
-versions/*/.build_id
-versions/*/.test.cid
+versions/
 .docker/config.env
 .envrc
 
