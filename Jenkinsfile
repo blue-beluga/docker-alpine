@@ -2,6 +2,7 @@
 pipeline {
   agent { label 'docker' }
 
+  stages {
     stage('Build Alpine') {
       steps {
         ansiColor('xterm') {
