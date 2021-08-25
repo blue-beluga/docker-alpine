@@ -110,7 +110,7 @@ control 'root-06' do
   desc 'Check that the current user is the root user.'
 
   describe shadow.users('root') do
-     its('passwords') { should cmp '' }
+     its('passwords') { should cmp "!" }
   end
 end
 

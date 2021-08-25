@@ -1,3 +1,3 @@
 # encoding: UTF-8
 
-LATEST_TAG=3.5
+LATEST_TAG=3.14.1

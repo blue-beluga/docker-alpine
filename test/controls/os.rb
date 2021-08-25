@@ -270,17 +270,17 @@ control 'os-13' do
   title 'Check network connectivity'
   desc 'Check network connectivity.'
 
-  describe host('8.8.8.8', port: 53, proto: 'udp') do
+  describe host('8.8.8.8', port: 53, protocol: 'udp') do
     it { should be_reachable }
     it { should be_resolvable }
   end
 
-  describe host('8.8.4.4', port: 53, proto: 'udp') do
+  describe host('8.8.4.4', port: 53, protocol: 'udp') do
     it { should be_reachable }
     it { should be_resolvable }
   end
 
-  describe host('google.com', port: 80, proto: 'tcp') do
+  describe host('google.com', port: 80, protocol: 'tcp') do
     it { should be_reachable }
     it { should be_resolvable }
   end
@@ -387,7 +387,7 @@ control 'os-21' do
 
   describe command('git --version') do
     its('exit_status') { should eq 0 }
-    its('stdout') { should match /^git version 2.11.2$/ }
+    its('stdout') { should match /^git version 2.32.0$/ }
     its('stderr') { should eq '' }
   end
 end
@@ -462,11 +462,11 @@ control 'os-25' do
   desc 'OpenSSH must not be running.'
 
   describe processes('ssh') do
-    its('list.length') { should eq 0 }
+    its('entries.length') { should eq 0 }
   end
 
   describe processes('sshd') do
-    its('list.length') { should eq 0 }
+    its('entries.length') { should eq 0 }
   end
 
   describe port(22) do
