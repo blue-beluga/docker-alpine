@@ -23,6 +23,9 @@
 
 title 'Alpine Linux release'
 
+alpine_version = input('alpine_version')
+alpine_version_id = input('alpine_version_id')
+
 control 'alpine-01' do
   impact 1.0
   title 'Check the Alpine Linux release'
@@ -33,29 +36,29 @@ control 'alpine-01' do
   end
 
   describe os.family do
-    it { should eq 'alpine' }
+    it { should eq 'linux' }
   end
 
   describe os.release do
-    it { should eq '3.5.2' }
+    it { should eq alpine_version_id }
   end
 end
 
-control 'alpine-02' do
-  impact 0.5
-  title 'Check the system is using a 64-bit kernel'
-  desc 'Ensure that Alpine Linux is running with a 64-bit kernel.'
-
-  describe os.arch do
-    it { should eq 'x86_64' }
-  end
-
-  describe command('uname -a | grep -o x86_64') do
-    its('exit_status') { should eq 0 }
-    its('stdout') { should match /^x86_64$/ }
-    its('stderr') { should eq '' }
-  end
-end
+# control 'alpine-02' do
+#   impact 0.5
+#   title 'Check the system is using a 64-bit kernel'
+#   desc 'Ensure that Alpine Linux is running with a 64-bit kernel.'
+#
+#   describe os.arch do
+#     it { should eq 'x86_64' }
+#   end
+#
+#   describe command('uname -a | grep -o x86_64') do
+#     its('exit_status') { should eq 0 }
+#     its('stdout') { should match /^x86_64$/ }
+#     its('stderr') { should eq '' }
+#   end
+# end
 
 control 'alpine-03' do
   impact 1.0
@@ -135,8 +138,8 @@ control 'alpine-08' do
   describe file('/etc/os-release') do
     its('content') { should match /^NAME="Alpine Linux"$/ }
     its('content') { should match /^ID=alpine$/ }
-    its('content') { should match /^VERSION_ID=3.5.2$/ }
-    its('content') { should match /^PRETTY_NAME="Alpine Linux v3.5"$/ }
+    its('content') { should match /^VERSION_ID=#{alpine_version_id}$/ }
+    its('content') { should match /^PRETTY_NAME="Alpine Linux v#{alpine_version}"$/ }
   end
 end
 
@@ -216,7 +219,7 @@ control 'alpine-14' do
   desc 'Check for the correct version of Alpine Linux from /etc/alpine-release.'
 
   describe file('/etc/alpine-release') do
-    its('content') { should match /^3.5.2$/ }
+    its('content') { should match /^#{alpine_version_id}$/ }
   end
 end
 
@@ -297,11 +300,11 @@ control 'alpine-20' do
 
   describe file('/etc/apk/repositories') do
     its('content') {
-      should match /^http:\/\/dl-cdn.alpinelinux.org\/alpine\/v3.5\/main$/
+      should match /^https:\/\/dl-cdn.alpinelinux.org\/alpine\/v#{alpine_version}\/main$/
     }
 
     its('content') {
-      should match /^http:\/\/dl-cdn.alpinelinux.org\/alpine\/v3.5\/community$/
+      should match /^https:\/\/dl-cdn.alpinelinux.org\/alpine\/v#{alpine_version}\/community$/
     }
   end
 end

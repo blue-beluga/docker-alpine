@@ -131,6 +131,7 @@ export TAG
 DOCKERFILE = versions/$(VERSION)/Dockerfile
 BUILD_ID   = versions/$(VERSION)/.build_id
 CIDFILE    = versions/$(VERSION)/.test_id
+INPUTS     = versions/$(VERSION)/inputs.yml
 
 define banner
 	@printf "$(YELLOW)---------------------------------------------------------\n"
@@ -157,7 +158,8 @@ endef
 define test_container
 	@docker run -i --rm -v $(CURDIR):/share \
 							-v /var/run/docker.sock:/var/run/docker.sock \
-							chef/inspec exec test --format=doc \
+							cincproject/auditor exec test \
+							--input-file versions/$(TAG)/inputs.yml \
 							-t docker://`cat $(CIDFILE)`
 endef
 
@@ -176,14 +178,14 @@ banner:
 deps: banner
 	$(call say,Pulling Image,$(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG))
 	@docker pull $(FROM_REGISTRY)/$(FROM_REPOSITORY):$(FROM_TAG)
-	$(call say,Pulling Image,chef/inspec)
-	@docker pull chef/inspec
+	$(call say,Pulling Image,cincproject/auditor)
+	@docker pull cincproject/auditor
 
 # `build` depends on `.build`, that rule is a bit particular as it actually
 # represent a file on disc. It is used as placeholder to know if we need to
 # redo the build. In a “regular” Makefile scenario, we would have source file
 # instead.
-build: banner $(DOCKERFILE) .build
+build: banner $(DOCKERFILE) $(INPUTS) .build
 
 # If `.build` exists and didn’t change (mtime), then do nothing, otherwise,
 # executre the rule.
@@ -247,6 +249,7 @@ clean: banner
 	@rm -f versions/*/Dockerfile \
 				 versions/*/.build_id \
 				 versions/*/.test_id \
+				 versions/*/inputs.yml \
 				 versions/*/$(REPOSITORY)-*.tar
 	@docker images -qa $(REPOSITORY):$(TAG) | xargs docker rmi -f
 	@docker images -qa $(REPOSITORY):latest | xargs docker rmi -f
@@ -262,6 +265,13 @@ else
 	@cp Dockerfile > $(DOCKERFILE)
 endif
 
+versions/$(TAG)/inputs.yml: inputs.tmpl | $(TAG)
+ifneq (,$(wildcard inputs.tmpl))
+	@alpine_version=$(ALPINE_VERSION) \
+		alpine_version_id=$(FROM_TAG) \
+    bin/render inputs.tmpl > $(INPUTS)
+endif
+
 # Pseudo targets for Dockerfile and Dockerfile.tmpl. They don't technically
 # create anything, but each warn if the other file is missing (meaning both
 # files are missing).
@@ -273,6 +283,11 @@ endif
 Dockerfile:
 ifneq (,$(wildcard Dockerfile))
 	$(warning You must create a 'Dockerfile.tmpl' or 'Dockerfile')
+endif
+
+inputs.tmpl:
+ifneq (,$(wildcard inputs.tmpl))
+	$(warning You must create a 'inputs.tmpl')
 endif
 
 $(TAG):

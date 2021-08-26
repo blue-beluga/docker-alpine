@@ -8,5 +8,19 @@ copyright_email: nospam@bluebeluga.io
 license: MIT
 summary: Test-suite for BlueBeluga hardend images
 version: 1.0.0
+
 supports:
   - os-family: unix
+
+inputs:
+  - name: alpine_version
+    description: "The version of Alpine Linux."
+    type: Numeric
+    required: true
+    value: '3.14'
+    
+  - name: alpine_version_id
+    description: "The version ID of Alpine Linux."
+    type: String
+    required: true
+    value: '3.14.1'

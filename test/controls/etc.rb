@@ -245,91 +245,91 @@ control 'etc-16' do
   end
 end
 
-control 'etc-17' do
-  impact 1.0
-  title 'The /etc/TZ file must exist'
-  desc 'Check periodically the owner and permissions for /etc/TZ.'
-
-  describe file('/etc/TZ') do
-    it { should exist }
-  end
-end
-
-control 'etc-18' do
-  impact 1.0
-  title 'The /etc/TZ file must be the correct type'
-  desc 'Check periodically the owner and permissions for /etc/TZ.'
-
-  describe file('/etc/TZ') do
-    it { should be_file }
-  end
-
-  describe file('/etc/TZ') do
-    it { should_not be_pipe }
-    it { should_not be_socket }
-    it { should_not be_symlink }
-    it { should_not be_mounted }
-    it { should_not be_directory }
-    it { should_not be_block_device }
-    it { should_not be_character_device }
-  end
-end
-
-control 'etc-19' do
-  impact 1.0
-  title 'The /etc/TZ file must be owned by root'
-  desc 'Check periodically the owner and permissions for /etc/TZ.'
-
-  describe file('/etc/TZ') do
-    it { should be_owned_by 'root' }
-    its('owner') { should eq 'root' }
-  end
-end
-
-control 'etc-20' do
-  impact 1.0
-  title 'The /etc/TZ file must be group-owned by root'
-  desc 'Check periodically the owner and permissions for /etc/TZ.'
-
-  describe file('/etc/TZ') do
-    its('group') { should eq 'root' }
-  end
-end
-
-control 'etc-21' do
-  impact 1.0
-  title 'The /etc/TZ file must have mode 0644 or less permissive'
-  desc 'Check periodically the owner and permissions for /etc/TZ.'
-
-  describe file('/etc/TZ') do
-    it { should be_writable.by 'owner' }
-    it { should be_readable.by 'owner' }
-    it { should be_readable.by 'group' }
-    it { should be_readable.by 'other' }
-    it { should_not be_writable.by 'group' }
-    it { should_not be_writable.by 'other' }
-    it { should_not be_executable.by 'owner' }
-    it { should_not be_executable.by 'group' }
-    it { should_not be_executable.by 'other' }
-    its('mode') { should cmp '0644' }
-  end
-end
-
-control 'etc-22' do
-  impact 1.0
-  title 'The timezone is set to UTC'
-  desc 'Check that the timezone is set correctly.'
-
-  describe file('/etc/TZ') do
-    its('content') { should match /^UTC$/ }
-  end
-
-  describe command('date +%Z') do
-    its('exit_status') { should eq 0 }
-    its('stdout') { should match /^UTC$/ }
-    its('stderr') { should eq '' }
-  end
-end
+# control 'etc-17' do
+#   impact 1.0
+#   title 'The /etc/TZ file must exist'
+#   desc 'Check periodically the owner and permissions for /etc/TZ.'
+#
+#   describe file('/etc/TZ') do
+#     it { should exist }
+#   end
+# end
+#
+# control 'etc-18' do
+#   impact 1.0
+#   title 'The /etc/TZ file must be the correct type'
+#   desc 'Check periodically the owner and permissions for /etc/TZ.'
+#
+#   describe file('/etc/TZ') do
+#     it { should be_file }
+#   end
+#
+#   describe file('/etc/TZ') do
+#     it { should_not be_pipe }
+#     it { should_not be_socket }
+#     it { should_not be_symlink }
+#     it { should_not be_mounted }
+#     it { should_not be_directory }
+#     it { should_not be_block_device }
+#     it { should_not be_character_device }
+#   end
+# end
+#
+# control 'etc-19' do
+#   impact 1.0
+#   title 'The /etc/TZ file must be owned by root'
+#   desc 'Check periodically the owner and permissions for /etc/TZ.'
+#
+#   describe file('/etc/TZ') do
+#     it { should be_owned_by 'root' }
+#     its('owner') { should eq 'root' }
+#   end
+# end
+#
+# control 'etc-20' do
+#   impact 1.0
+#   title 'The /etc/TZ file must be group-owned by root'
+#   desc 'Check periodically the owner and permissions for /etc/TZ.'
+#
+#   describe file('/etc/TZ') do
+#     its('group') { should eq 'root' }
+#   end
+# end
+#
+# control 'etc-21' do
+#   impact 1.0
+#   title 'The /etc/TZ file must have mode 0644 or less permissive'
+#   desc 'Check periodically the owner and permissions for /etc/TZ.'
+#
+#   describe file('/etc/TZ') do
+#     it { should be_writable.by 'owner' }
+#     it { should be_readable.by 'owner' }
+#     it { should be_readable.by 'group' }
+#     it { should be_readable.by 'other' }
+#     it { should_not be_writable.by 'group' }
+#     it { should_not be_writable.by 'other' }
+#     it { should_not be_executable.by 'owner' }
+#     it { should_not be_executable.by 'group' }
+#     it { should_not be_executable.by 'other' }
+#     its('mode') { should cmp '0644' }
+#   end
+# end
+#
+# control 'etc-22' do
+#   impact 1.0
+#   title 'The timezone is set to UTC'
+#   desc 'Check that the timezone is set correctly.'
+#
+#   describe file('/etc/TZ') do
+#     its('content') { should match /^UTC$/ }
+#   end
+#
+#   describe command('date +%Z') do
+#     its('exit_status') { should eq 0 }
+#     its('stdout') { should match /^UTC$/ }
+#     its('stderr') { should eq '' }
+#   end
+# end
 
 control 'etc-23' do
   impact 1.0
