@@ -78,11 +78,12 @@ CMD ["myapp", "start"]
 
 ## Available Tags
 
-* `latest`: **Currently 3.5**
+* `latest`: **Currently 3.14.1**
 * `3.2`:
 * `3.3`:
 * `3.4`
 * `3.5`
+* `3.14.1`
 * `edge`:
 
 ## Build
